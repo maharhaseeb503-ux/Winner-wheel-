@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Winner Wheel</title>
+<style>
+  body{text-align:center;font-family:Arial;background:#111;color:white}
+  canvas{margin-top:20px}
+  button{padding:12px 25px;font-size:18px;border:none;border-radius:10px;background:#ff2d55;color:white;cursor:pointer}
+  input{padding:8px;width:300px;margin:5px}
+</style>
+</head>
+<body>
+<h1>🎡 Winner Wheel</h1>
+<input id="names" value="Ali,Bilal,Faisal,Malik,Arus"><br>
+<button onclick="spin()">Spin</button>
+<canvas id="canvas" width="400" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let names = [];
+let angle = 0;
+
+function drawWheel(){
+  names = document.getElementById('names').value.split(',');
+  let arc = Math.PI*2/names.length;
+  for(let i=0;i<names.length;i++){
+    ctx.beginPath();
+    ctx.fillStyle = i%2==0? '#ff2d55' : '#00d4ff';
+    ctx.moveTo(200,200);
+    ctx.arc(200,200,200,arc*i,arc*(i+1));
+    ctx.lineTo(200,200);
+    ctx.fill();
+    ctx.fillStyle="white";
+    ctx.save();
+    ctx.translate(200,200);
+    ctx.rotate(arc*i + arc/2);
+    ctx.fillText(names[i], 80, 10);
+    ctx.restore();
+  }
+}
+function spin(){
+  let spinAngle = Math.random()*360 + 720;
+  angle += spinAngle;
+  canvas.style.transform = `rotate(${angle}deg)`;
+  setTimeout(()=>{
+    let winner = names[Math.floor(Math.random()*names.length)];
+    alert("🎉 Winner: " + winner + "\nPrize: Rs. 100");
+  },4000)
+}
+drawWheel();
+</script>
+</body>
+</html>
