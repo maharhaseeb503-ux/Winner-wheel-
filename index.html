@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,163 +6,103 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Winner Wheel</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif}
-  body{background:#12052f;color:#fff;display:flex;flex-direction:column;align-items:center;padding:15px}
- .topbar{background:#1e0f42;width:100%;max-width:420px;padding:10px 15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
- .topbar.logo{font-weight:bold;color:#ffb700;font-size:20px}
- .topbar.info{background:#2a1a5a;padding:5px 10px;border-radius:8px;font-size:14px}
- .tabs{display:flex;gap:8px;margin-bottom:10px}
- .tab{padding:8px 14px;border-radius:8px;background:#2a1a5a;cursor:pointer}
- .tab.active{background:#ffb700;color:#000;font-weight:bold}
- .wheel-box{background:#1e0f42;padding:20px;border-radius:20px;width:100%;max-width:420px;text-align:center}
-  #wheelCanvas{background:radial-gradient(circle,#2a1a5a 0%,#12052f 100%);border-radius:50%}
-  #spinBtn{background:#ffb700;color:#000;border:none;padding:12px 30px;border-radius:50px;font-size:18px;font-weight:bold;margin-top:15px;cursor:pointer}
-  #spinBtn:disabled{opacity:0.5}
- .controls{margin-top:15px;background:#1e0f42;padding:12px;border-radius:12px;text-align:left}
- .controls input,.controls button{width:100%;margin:5px 0;padding:8px;border-radius:8px;border:none}
- .controls button{background:#ffb700;color:#000;font-weight:bold;cursor:pointer}
- .winner-popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:99}
- .winner-card{background:#1e0f42;padding:25px;border-radius:20px;text-align:center;animation:pop 0.4s}
-  @keyframes pop{0%{transform:scale(0.5)}100%{transform:scale(1)}}
- .winner-card h2{color:#ffb700;margin-bottom:10px}
- .confetti{position:absolute;width:8px;height:8px;background:#ffb700;animation:fall 2s linear forwards}
-  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+  body{background:linear-gradient(180deg,#1a0033 0%,#0d001a 100%);color:#fff;font-family:'Segoe UI',Arial;display:flex;justify-content:center;padding:10px}
+  .container{width:100%;max-width:420px}
+  .topbar{background:#160028;padding:12px 15px;border-radius:15px;display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;box-shadow:0 0 15px #000}
+  .logo{font-size:20px;font-weight:bold;color:#ffb700}
+  .badge{background:#2a0a45;padding:6px 12px;border-radius:10px;font-size:14px;display:flex;gap:5px;align-items:center}
+  .tabs{display:flex;gap:10px;background:#160028;padding:6px;border-radius:15px;margin-bottom:10px}
+  .tab{flex:1;padding:10px;border-radius:12px;text-align:center;font-weight:bold;cursor:pointer;transition:0.3s}
+  .tab.active{background:linear-gradient(90deg,#ffb700,#ff8c00);color:#000}
+  .wheel-wrap{background:#160028;padding:20px;border-radius:20px;position:relative;text-align:center;box-shadow:0 0 20px #000}
+  #wheelCanvas{border:8px solid #ffb700;border-radius:50%;box-shadow:0 0 40px #ffb70060;transition:transform 3s cubic-bezier(0.25,0.1,0.25,1)}
+  .pointer{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-bottom:30px solid #ffb700;filter:drop-shadow(0 0 5px #ffb700)}
+  .center-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:95px;height:95px;border-radius:50%;background:linear-gradient(180deg,#ffb700,#ff8c00);display:flex;flex-direction:column;justify-content:center;align-items:center;color:#000;font-weight:bold;font-size:16px;cursor:pointer;box-shadow:0 0 25px #ffb700;border:4px solid #fff}
+  .big-spin{width:100%;padding:18px;margin-top:15px;background:linear-gradient(90deg,#ffb700,#ff8c00);border:none;border-radius:15px;font-size:22px;font-weight:bold;color:#000;cursor:pointer;box-shadow:0 5px 15px #ffb70050}
+  .controls{margin-top:15px;background:#160028;padding:15px;border-radius:15px}
+  input{width:100%;padding:10px;margin:8px 0;border-radius:10px;border:none;background:#2a0a45;color:#fff;font-size:15px}
+  .btn{width:100%;padding:10px;background:#ffb700;color:#000;border:none;border-radius:10px;font-weight:bold;margin-top:5px;cursor:pointer}
 </style>
 </head>
 <body>
+<div class="container">
+  <div class="topbar">
+    <div class="logo">👑 Super Winner</div>
+    <div class="badge">👥 <span id="memberCount">10</span></div>
+    <div class="badge">🎁 Rs. <span id="rewardAmount">250</span></div>
+  </div>
 
-<div class="topbar">
-  <div class="logo">👑 Spinza</div>
-  <div class="info">Members: <span id="memberCount">6</span></div>
-  <div class="info">Rs. <span id="rewardAmount">100</span></div>
-</div>
+  <div class="tabs">
+    <div class="tab active" id="tabWinner">👥 Winner wheel</div>
+    <div class="tab" id="tabPrize">🎁 Prize wheel</div>
+  </div>
+  <div style="text-align:center;color:#aaa;font-size:13px;margin-bottom:10px"><span id="sliceCount">10</span> slices on the wheel</div>
 
-<div class="tabs">
-  <div class="tab active">Winner wheel</div>
-  <div class="tab">Prize wheel</div>
-</div>
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheelCanvas" width="340" height="340"></canvas>
+    <div class="center-spin" onclick="spinWheel()">▶<br>SPIN</div>
+  </div>
 
-<div class="wheel-box">
-  <canvas id="wheelCanvas" width="320" height="320"></canvas>
-  <div id="winnerName" style="margin-top:10px;font-size:16px">~ Spin ~</div>
-  <button id="spinBtn">SPIN</button>
-</div>
+  <button class="big-spin" onclick="spinWheel()">SPIN FOR WINNER</button>
 
-<div class="controls">
-  <b>Settings</b>
-  <input type="text" id="namesInput" placeholder="Names comma se likho: Ali,Bilal,Malik,Faisal">
-  <input type="number" id="rewardInput" placeholder="Reward Amount" value="100">
-  <label><input type="checkbox" id="removeWinner" checked> Winner ko next round me remove karo</label>
-  <button onclick="updateWheel()">Wheel Update karo</button>
-</div>
-
-<div class="winner-popup" id="winnerPopup">
-  <div class="winner-card">
-    <h2>🎉 WE HAVE A WINNER 🎉</h2>
-    <h1 id="winnerText">Ali</h1>
-    <p>1st Prize: Rs. <span id="winAmount">100</span></p>
-    <button onclick="closePopup()">Done</button>
-    <button onclick="spinWheel()">Spin Again</button>
+  <div class="controls">
+    <b>Names Change کریں</b>
+    <input type="text" id="namesInput" placeholder="Comma سے نام لکھیں: Ali,Bilal,Hassam,Zain...">
+    <b>Reward Change کریں</b>
+    <input type="number" id="rewardInput" value="250" placeholder="Rs. Amount">
+    <button class="btn" onclick="updateWheel()">Wheel Update کریں</button>
   </div>
 </div>
 
 <script>
-let members = ["Ali","Bilal","Malik","Faisal","Ahsan","Zain"];
-let reward = 100;
-let angle = 0;
-let spinning = false;
-let canvas = document.getElementById("wheelCanvas");
-let ctx = canvas.getContext("2d");
+let members = ["Hassam","Zain","Mahad","Tariq","Mubasir","Shafiq","Tanveer","Awais","Yousaf","Roa Ahmad"];
+let reward = 250; let angle=0, spinning=false;
+let canvas=document.getElementById("wheelCanvas"); let ctx=canvas.getContext("2d");
 
 function drawWheel(){
-  let num = members.length;
-  let arc = 2*Math.PI/num;
-  ctx.clearRect(0,0,320,320);
+  let num=members.length; let arc=2*Math.PI/num;
+  ctx.clearRect(0,0,340,340);
   for(let i=0;i<num;i++){
-    ctx.beginPath();
-    ctx.moveTo(160,160);
-    ctx.arc(160,160,150, i*arc, (i+1)*arc);
-    ctx.fillStyle = `hsl(${i*360/num}, 70%, 55%)`;
-    ctx.fill();
-    ctx.save();
-    ctx.translate(160,160);
-    ctx.rotate(i*arc + arc/2);
-    ctx.fillStyle="#fff";
-    ctx.font="14px Arial";
-    ctx.fillText(members[i], 80, 5);
-    ctx.restore();
+    ctx.beginPath(); ctx.moveTo(170,170);
+    ctx.arc(170,170,160, i*arc, (i+1)*arc);
+    ctx.fillStyle=`hsl(${i*360/num},85%,55%)`; ctx.fill(); 
+    ctx.strokeStyle="#160028"; ctx.lineWidth=3; ctx.stroke();
+    ctx.save(); ctx.translate(170,170); ctx.rotate(i*arc+arc/2);
+    ctx.fillStyle="#fff"; ctx.font="bold 14px Arial"; ctx.textAlign="center";
+    ctx.fillText(members[i], 100, 5); ctx.restore();
+    // golden dots
+    ctx.beginPath(); ctx.arc(170+155*Math.cos(i*arc+arc/2),170+155*Math.sin(i*arc+arc/2),5,0,2*Math.PI);
+    ctx.fillStyle="#ffb700"; ctx.fill();
   }
-  // pointer
-  ctx.beginPath();
-  ctx.moveTo(160,5);
-  ctx.lineTo(150,25);
-  ctx.lineTo(170,25);
-  ctx.fillStyle="#ffb700";
-  ctx.fill();
 }
 drawWheel();
 
 function spinWheel(){
-  if(spinning) return;
-  spinning=true;
-  document.getElementById("spinBtn").disabled=true;
-  let spins = Math.random()*360 + 1800;
-  let duration = 4000;
-  let start = null;
+  if(spinning) return; spinning=true;
+  let spins=Math.random()*360+2160; let duration=3500; let start=null;
   function animate(ts){
-    if(!start) start=ts;
-    let progress = ts-start;
-    let ease = 1 - Math.pow(1-progress/duration,3);
-    angle = spins*ease;
-    canvas.style.transform = `rotate(${angle}deg)`;
-    if(progress<duration){requestAnimationFrame(animate)}
-    else{showWinner()}
+    if(!start) start=ts; let p=ts-start; let ease=1-Math.pow(1-p/duration,4);
+    angle=spins*ease; canvas.style.transform=`rotate(${angle}deg)`;
+    if(p<duration) requestAnimationFrame(animate); else {spinning=false; alert("🎉 Winner: "+getWinner())}
   }
   requestAnimationFrame(animate);
 }
 
-function showWinner(){
-  let num = members.length;
-  let arc = 360/num;
-  let deg = (360 - angle%360 + 90)%360;
-  let index = Math.floor(deg/arc);
-  let winner = members[index];
-  document.getElementById("winnerName").innerText = `~ ${winner} ~`;
-  document.getElementById("winnerText").innerText = winner;
-  document.getElementById("winAmount").innerText = reward;
-  document.getElementById("winnerPopup").style.display="flex";
-  showConfetti();
-  if(document.getElementById("removeWinner").checked){
-    members.splice(index,1);
-    document.getElementById("memberCount").innerText = members.length;
-    drawWheel();
-  }
-  spinning=false;
-  document.getElementById("spinBtn").disabled=false;
+function getWinner(){
+  let num=members.length; let arc=360/num;
+  let deg=(360-angle%360+90)%360; return members[Math.floor(deg/arc)];
 }
 
-function closePopup(){document.getElementById("winnerPopup").style.display="none"}
 function updateWheel(){
-  let names = document.getElementById("namesInput").value;
-  if(names) members = names.split(",").map(n=>n.trim());
-  reward = document.getElementById("rewardInput").value || 100;
-  document.getElementById("rewardAmount").innerText = reward;
-  document.getElementById("memberCount").innerText = members.length;
+  let n=document.getElementById("namesInput").value;
+  if(n) members=n.split(",").map(x=>x.trim());
+  reward=document.getElementById("rewardInput").value;
+  document.getElementById("memberCount").innerText=members.length;
+  document.getElementById("sliceCount").innerText=members.length;
+  document.getElementById("rewardAmount").innerText=reward;
   drawWheel();
 }
-
-function showConfetti(){
-  for(let i=0;i<80;i++){
-    let c = document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*100+"vw";
-    c.style.background=`hsl(${Math.random()*360},100%,60%)`;
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),2000);
-  }
-}
-
-document.getElementById("spinBtn").onclick=spinWheel;
 </script>
 </body>
 </html>
