@@ -5,108 +5,163 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Winner Wheel</title>
 <style>
-  body { background: linear-gradient(135deg, #0f051a, #2d1b4e); color: white; font-family: 'Arial'; text-align: center; margin: 0; padding: 15px; }
-  h1 { color: #FFD700; text-shadow: 0 0 10px #FFD700; }
-.header { display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
-.btn { background: #1e0f2e; padding: 12px 18px; border-radius: 15px; border: 2px solid #FFD700; color: #FFD700; font-weight: bold; font-size: 16px; }
-.wheel-box { background: #1e0f2e; border-radius: 25px; padding: 25px; max-width: 500px; margin: auto; box-shadow: 0 0 40px #FFD70055; }
-  #wheel { transition: transform 5s cubic-bezier(0.17,0.89,0.32,1.49); max-width: 100%; }
-  #spinBtn { background: linear-gradient(45deg, #FFD700, #FFA500); color: black; padding: 18px 50px; border: none; border-radius: 20px; font-size: 22px; font-weight: bold; margin-top: 20px; cursor: pointer; width: 90%; box-shadow: 0 5px 20px #FFD70099; }
-  #spinBtn:disabled { opacity: 0.5; }
-.dashboard { background: #1e0f2e; padding: 20px; border-radius: 20px; margin: 20px auto; text-align: left; max-width: 500px; }
-  input { padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #FFD700; width: 100%; background: #0f051a; color: white; box-sizing: border-box; font-size: 15px; }
-.popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 999; }
-.popup-content { background: linear-gradient(135deg, #1e0f2e, #2d1b4e); padding: 30px; border-radius: 25px; border: 3px solid #FFD700; width: 90%; max-width: 400px; text-align: center; animation: pop 0.6s; box-shadow: 0 0 50px #FFD70099; }
-  @keyframes pop { from{transform:scale(0.5) rotate(-10deg)} to{transform:scale(1) rotate(0)} }
-.crown { font-size: 80px; animation: bounce 1s infinite; }
-  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-.reward-box { background: #0f051a; padding: 15px; border-radius: 15px; margin: 15px 0; border: 2px solid #FFD700; font-size: 18px; }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif}
+  body{background:#12052f;color:#fff;display:flex;flex-direction:column;align-items:center;padding:15px}
+ .topbar{background:#1e0f42;width:100%;max-width:420px;padding:10px 15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+ .topbar.logo{font-weight:bold;color:#ffb700;font-size:20px}
+ .topbar.info{background:#2a1a5a;padding:5px 10px;border-radius:8px;font-size:14px}
+ .tabs{display:flex;gap:8px;margin-bottom:10px}
+ .tab{padding:8px 14px;border-radius:8px;background:#2a1a5a;cursor:pointer}
+ .tab.active{background:#ffb700;color:#000;font-weight:bold}
+ .wheel-box{background:#1e0f42;padding:20px;border-radius:20px;width:100%;max-width:420px;text-align:center}
+  #wheelCanvas{background:radial-gradient(circle,#2a1a5a 0%,#12052f 100%);border-radius:50%}
+  #spinBtn{background:#ffb700;color:#000;border:none;padding:12px 30px;border-radius:50px;font-size:18px;font-weight:bold;margin-top:15px;cursor:pointer}
+  #spinBtn:disabled{opacity:0.5}
+ .controls{margin-top:15px;background:#1e0f42;padding:12px;border-radius:12px;text-align:left}
+ .controls input,.controls button{width:100%;margin:5px 0;padding:8px;border-radius:8px;border:none}
+ .controls button{background:#ffb700;color:#000;font-weight:bold;cursor:pointer}
+ .winner-popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:99}
+ .winner-card{background:#1e0f42;padding:25px;border-radius:20px;text-align:center;animation:pop 0.4s}
+  @keyframes pop{0%{transform:scale(0.5)}100%{transform:scale(1)}}
+ .winner-card h2{color:#ffb700;margin-bottom:10px}
+ .confetti{position:absolute;width:8px;height:8px;background:#ffb700;animation:fall 2s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
 </style>
 </head>
 <body>
 
-<h1>🏆 SUPER WINNER WHEEL 🏆</h1>
-<div class="header">
-  <div class="btn">👥 Members: <span id="memberCount">10</span></div>
-  <div class="btn">💰 Reward: Rs. <span id="reward">250</span></div>
+<div class="topbar">
+  <div class="logo">👑 Spinza</div>
+  <div class="info">Members: <span id="memberCount">6</span></div>
+  <div class="info">Rs. <span id="rewardAmount">100</span></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active">Winner wheel</div>
+  <div class="tab">Prize wheel</div>
 </div>
 
 <div class="wheel-box">
-  <canvas id="wheel" width="400" height="400"></canvas>
-  <br><button id="spinBtn">🎰 SPIN NOW 🎰</button>
+  <canvas id="wheelCanvas" width="320" height="320"></canvas>
+  <div id="winnerName" style="margin-top:10px;font-size:16px">~ Spin ~</div>
+  <button id="spinBtn">SPIN</button>
 </div>
 
-<div class="dashboard">
-  <h3>⚙️ Control Panel</h3>
-  <b>Names, سے الگ کریں:</b><input type="text" id="namesInput" value="Ali,Bilal,Faisal,Malik,Arus,Hassam,Zain,Mahad,Tariq,Mubasir">
-  <b>Reward Amount Rs:</b><input type="number" id="rewardInput" value="250">
-  <br><button onclick="updateWheel()" style="background:#FFD700; color:black; width:100%; font-weight:bold; padding:12px; font-size:16px;">Update Wheel</button>
+<div class="controls">
+  <b>Settings</b>
+  <input type="text" id="namesInput" placeholder="Names comma se likho: Ali,Bilal,Malik,Faisal">
+  <input type="number" id="rewardInput" placeholder="Reward Amount" value="100">
+  <label><input type="checkbox" id="removeWinner" checked> Winner ko next round me remove karo</label>
+  <button onclick="updateWheel()">Wheel Update karo</button>
 </div>
 
-<div class="popup" id="winnerPopup">
-  <div class="popup-content">
-    <div class="crown">👑</div>
-    <p style="color:#FFD700; font-size:16px; margin:5px 0;">🎉 CONGRATULATIONS 🎉</p>
-    <h2 id="winnerName" style="font-size:36px; margin:10px 0; color:#FFD700;">Ali</h2>
-    <div class="reward-box">
-      <b>Winner Gets: Rs. <span id="winnerReward">250</span></b>
-    </div>
-    <button onclick="closePopup()" style="background:#444; color:white; width:48%; padding:12px;">Done</button>
-    <button onclick="spinAgain()" style="background:#FFD700; color:black; width:48%; font-weight:bold; padding:12px;">🔄 Spin Again</button>
+<div class="winner-popup" id="winnerPopup">
+  <div class="winner-card">
+    <h2>🎉 WE HAVE A WINNER 🎉</h2>
+    <h1 id="winnerText">Ali</h1>
+    <p>1st Prize: Rs. <span id="winAmount">100</span></p>
+    <button onclick="closePopup()">Done</button>
+    <button onclick="spinWheel()">Spin Again</button>
   </div>
 </div>
 
 <script>
-let colors = ["#8B5CF6","#EC4899","#EF4444","#F97316","#F59E0B","#EAB308","#84CC16","#22C55E","#06B6D4","#3B82F6"];
-let currentNames = [];
+let members = ["Ali","Bilal","Malik","Faisal","Ahsan","Zain"];
+let reward = 100;
+let angle = 0;
+let spinning = false;
+let canvas = document.getElementById("wheelCanvas");
+let ctx = canvas.getContext("2d");
 
-function updateWheel() {
-  currentNames = document.getElementById('namesInput').value.split(',').filter(n=>n.trim()!="");
-  document.getElementById('memberCount').innerText = currentNames.length;
-  document.getElementById('reward').innerText = document.getElementById('rewardInput').value;
+function drawWheel(){
+  let num = members.length;
+  let arc = 2*Math.PI/num;
+  ctx.clearRect(0,0,320,320);
+  for(let i=0;i<num;i++){
+    ctx.beginPath();
+    ctx.moveTo(160,160);
+    ctx.arc(160,160,150, i*arc, (i+1)*arc);
+    ctx.fillStyle = `hsl(${i*360/num}, 70%, 55%)`;
+    ctx.fill();
+    ctx.save();
+    ctx.translate(160,160);
+    ctx.rotate(i*arc + arc/2);
+    ctx.fillStyle="#fff";
+    ctx.font="14px Arial";
+    ctx.fillText(members[i], 80, 5);
+    ctx.restore();
+  }
+  // pointer
+  ctx.beginPath();
+  ctx.moveTo(160,5);
+  ctx.lineTo(150,25);
+  ctx.lineTo(170,25);
+  ctx.fillStyle="#ffb700";
+  ctx.fill();
+}
+drawWheel();
+
+function spinWheel(){
+  if(spinning) return;
+  spinning=true;
+  document.getElementById("spinBtn").disabled=true;
+  let spins = Math.random()*360 + 1800;
+  let duration = 4000;
+  let start = null;
+  function animate(ts){
+    if(!start) start=ts;
+    let progress = ts-start;
+    let ease = 1 - Math.pow(1-progress/duration,3);
+    angle = spins*ease;
+    canvas.style.transform = `rotate(${angle}deg)`;
+    if(progress<duration){requestAnimationFrame(animate)}
+    else{showWinner()}
+  }
+  requestAnimationFrame(animate);
+}
+
+function showWinner(){
+  let num = members.length;
+  let arc = 360/num;
+  let deg = (360 - angle%360 + 90)%360;
+  let index = Math.floor(deg/arc);
+  let winner = members[index];
+  document.getElementById("winnerName").innerText = `~ ${winner} ~`;
+  document.getElementById("winnerText").innerText = winner;
+  document.getElementById("winAmount").innerText = reward;
+  document.getElementById("winnerPopup").style.display="flex";
+  showConfetti();
+  if(document.getElementById("removeWinner").checked){
+    members.splice(index,1);
+    document.getElementById("memberCount").innerText = members.length;
+    drawWheel();
+  }
+  spinning=false;
+  document.getElementById("spinBtn").disabled=false;
+}
+
+function closePopup(){document.getElementById("winnerPopup").style.display="none"}
+function updateWheel(){
+  let names = document.getElementById("namesInput").value;
+  if(names) members = names.split(",").map(n=>n.trim());
+  reward = document.getElementById("rewardInput").value || 100;
+  document.getElementById("rewardAmount").innerText = reward;
+  document.getElementById("memberCount").innerText = members.length;
   drawWheel();
 }
 
-function drawWheel() {
-  const canvas = document.getElementById('wheel');
-  const ctx = canvas.getContext('2d');
-  const arc = Math.PI * 2 / currentNames.length;
-  ctx.clearRect(0,0,400,400);
-  for(let i=0; i<currentNames.length; i++) {
-    ctx.beginPath();
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.moveTo(200,200);
-    ctx.arc(200,200,180,i*arc,(i+1)*arc);
-    ctx.fill();
-    ctx.strokeStyle = "#FFD700"; ctx.lineWidth = 3; ctx.stroke();
-    ctx.save();
-    ctx.translate(200,200);
-    ctx.rotate(i*arc + arc/2);
-    ctx.fillStyle = "white";
-    ctx.font = "bold 16px Arial";
-    ctx.fillText(currentNames[i], 100, 5);
-    ctx.restore();
+function showConfetti(){
+  for(let i=0;i<80;i++){
+    let c = document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,60%)`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2000);
   }
 }
 
-updateWheel();
-
-document.getElementById('spinBtn').onclick = () => {
-  document.getElementById('spinBtn').disabled = true;
-  let deg = Math.floor(5000 + Math.random()*720);
-  document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
-  setTimeout(() => {showWinner(); document.getElementById('spinBtn').disabled = false;}, 5000);
-}
-
-function showWinner() {
-  let winner = currentNames[Math.floor(Math.random()*currentNames.length)];
-  document.getElementById('winnerName').innerText = winner;
-  document.getElementById('winnerReward').innerText = document.getElementById('rewardInput').value;
-  document.getElementById('winnerPopup').style.display = 'flex';
-}
-
-function closePopup() { document.getElementById('winnerPopup').style.display = 'none'; }
-function spinAgain() { closePopup(); document.getElementById('spinBtn').click(); }
+document.getElementById("spinBtn").onclick=spinWheel;
 </script>
 </body>
 </html>
